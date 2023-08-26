@@ -5,8 +5,8 @@ class Connect_4:
     def __init__(self):
         # https://stackoverflow.com/questions/12791501/why-does-this-code-for-initializing-a-list-of-lists-apparently-link-the-lists-to
         self.board = [[j for j in range(7)] for _ in range(6)]
-        self.pl_move = 'pl_1'
-        self.pl_not_move = 'pl_2'
+        self.pl_move = self.pl_comp = 'pl_1'
+        self.pl_not_move = self.pl_human = 'pl_2'
         self.pl_1_color = 'red'
         self.pl_2_color = 'yellow'
         self.pl_1_col_hover = "#FF7F7F"
@@ -39,7 +39,8 @@ class Connect_4:
         # 0-100 is move in column 0, 100-200 is move in column 2 e t.c.
         j = event.x // int(width/7)
         self.make_move_player(j)
-        self.minimax()
+        score = self.minimax()
+        print(score)
         self.switch_turns()
         victory, coordinates = self.check_win()
         if victory == "pl_1" or victory == "pl_2":
@@ -91,9 +92,18 @@ class Connect_4:
         return available_moves
     
     def minimax(self):
-        # This is going to be the AI.
+        # Minimax.
+        # Find available moves.
         available_moves = self.find_available()
         print(available_moves)
+        # See if there's a winner or if it's a draw.
+        winner, _ = self.check_win()
+        if winner == self.pl_comp:
+            return 10
+        elif winner == self.pl_human:
+            return -10
+        elif available_moves == []:
+            return 0
 
 game = Connect_4()
 
