@@ -92,6 +92,36 @@ class Connect_4:
                     break
         return available_moves
     
+    def calculate_heuristic(self, number):
+        return 1
+    
+    def find_line_of_four(self):
+        score = 0
+        for i in range(6):
+            for j in range(7):
+                if j < 4:
+                    # Check 4 in a row horizontally
+                    if "pl_1" in self.board[i][j:j+4] and "pl_2" not in self.board[i][j:j+4]:
+                        number = self.board[i][j:j+4].count("pl_1")
+                        score += self.calculate_heuristic(number)
+                    if "pl_2" in self.board[i][j:j+4] and "pl_1" not in self.board[i][j:j+4]:
+                        number = self.board[i][j:j+4].count("pl_2")
+                        score += self.calculate_heuristic(number)
+                    # Check victory diagonal top to bottom
+                    if (i > 2 and 
+                        self.board[i][j] == self.board[i-1][j+1] == self.board[i-2][j+2] == self.board[i-3][j+3]):
+                        pass
+                if i < 3:
+                    # Check victory in a column
+                    if (isinstance(self.board[i][j], str) and 
+                        self.board[i][j] == self.board[i+1][j] == self.board[i+2][j] == self.board[i+3][j]):
+                        pass
+                    # Check victory diagonal bottom to top
+                    if (j < 4 and 
+                        self.board[i][j] == self.board[i+1][j+1] == self.board[i+2][j+2] == self.board[i+3][j+3]):
+                        pass
+        return None, 0
+    
     def minimax(self, player, depth):
         # Minimax.
         # Find available moves.
@@ -107,8 +137,10 @@ class Connect_4:
         # If reached the depth, use heuristic.
         depth -= 1
         move_scores = {}
+        # Add heuristic here
         if depth == 0:
-            return None, 0
+            _, value = self.find_line_of_four()
+            return None, value
         else:
             for move in available_moves:
                 self.board[move[0]][move[1]] = player
@@ -133,11 +165,7 @@ class Connect_4:
                     maximize = move_scores[i]
                     max_index = i
         return max_index, maximize
-        
-
-
-        
-
+              
 game = Connect_4()
 
 window = tk.Tk()
