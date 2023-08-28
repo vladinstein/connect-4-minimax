@@ -11,6 +11,7 @@ class Connect_4:
         self.pl_2_color = 'yellow'
         self.pl_1_col_hover = "#FF7F7F"
         self.pl_2_col_hover = "#FFFD8F"
+        self.depth = 5
         
     def check_win(self):
         for i in range(6):
@@ -39,7 +40,7 @@ class Connect_4:
         # 0-100 is move in column 0, 100-200 is move in column 2 e t.c.
         j = event.x // int(width/7)
         self.make_move_player(j)
-        score = self.minimax()
+        score = self.minimax(self.pl_comp, self.depth)
         print(score)
         self.switch_turns()
         victory, coordinates = self.check_win()
@@ -76,7 +77,7 @@ class Connect_4:
                 canvas.itemconfig("empty", activefill=self.pl_2_col_hover if self.pl_move == "pl_1" else 
                                   self.pl_1_col_hover)
                 return
-            
+                
     def switch_turns(self):
         self.pl_move, self.pl_not_move = self.pl_not_move, self.pl_move
 
@@ -87,23 +88,55 @@ class Connect_4:
         for j in range(7):
             for i in reversed(range(6)):
                 if isinstance(self.board[i][j], int):
-                    available_moves.append(j)
+                    available_moves.append([i, j])
                     break
         return available_moves
     
-    def minimax(self):
+    def minimax(self, player, depth):
         # Minimax.
         # Find available moves.
         available_moves = self.find_available()
-        print(available_moves)
         # See if there's a winner or if it's a draw.
         winner, _ = self.check_win()
         if winner == self.pl_comp:
-            return 10
+            return None,  1000
         elif winner == self.pl_human:
-            return -10
+            return None, - 1000
         elif available_moves == []:
-            return 0
+            return None, 0
+        # If reached the depth, use heuristic.
+        depth -= 1
+        move_scores = {}
+        if depth == 0:
+            return None, 0
+        else:
+            for move in available_moves:
+                self.board[move[0]][move[1]] = player
+                if player == self.pl_comp:
+                    result = self.minimax(self.pl_human, depth)
+                    move_scores[move[1]] = result[1]
+                else:
+                    result = self.minimax(self.pl_comp, depth)
+                    move_scores[move[1]] = result[1]
+                self.board[move[0]][move[1]] = move[1]
+        # Calculation for choosing the move with the best score. 
+        if player == self.pl_comp:
+            maximize = - 10000
+            for i in move_scores:
+                if move_scores[i] > maximize:
+                    maximize = move_scores[i]
+                    max_index = i
+        else:
+            maximize = 10000 
+            for i in move_scores:
+                if move_scores[i] < maximize:
+                    maximize = move_scores[i]
+                    max_index = i
+        return max_index, maximize
+        
+
+
+        
 
 game = Connect_4()
 
