@@ -104,23 +104,40 @@ class Connect_4:
                     if "pl_1" in self.board[i][j:j+4] and "pl_2" not in self.board[i][j:j+4]:
                         number = self.board[i][j:j+4].count("pl_1")
                         score += self.calculate_heuristic(number)
-                    if "pl_2" in self.board[i][j:j+4] and "pl_1" not in self.board[i][j:j+4]:
+                    elif "pl_2" in self.board[i][j:j+4] and "pl_1" not in self.board[i][j:j+4]:
                         number = self.board[i][j:j+4].count("pl_2")
                         score += self.calculate_heuristic(number)
                     # Check victory diagonal top to bottom
-                    if (i > 2 and 
-                        self.board[i][j] == self.board[i-1][j+1] == self.board[i-2][j+2] == self.board[i-3][j+3]):
-                        pass
+                    if i > 2:
+                        top_to_bottom = [self.board[i][j], self.board[i-1][j+1], 
+                                        self.board[i-2][j+2], self.board[i-3][j+3]]
+                        if "pl_1" in top_to_bottom and "pl_2" not in top_to_bottom:
+                            number = top_to_bottom.count("pl_1")
+                            score += self.calculate_heuristic(number)
+                        elif "pl_2" in top_to_bottom and "pl_1" not in top_to_bottom:
+                            number = top_to_bottom.count("pl_2")
+                            score += self.calculate_heuristic(number)              
                 if i < 3:
                     # Check victory in a column
-                    if (isinstance(self.board[i][j], str) and 
-                        self.board[i][j] == self.board[i+1][j] == self.board[i+2][j] == self.board[i+3][j]):
-                        pass
+                    column = [self.board[i][j], self.board[i+1][j], 
+                              self.board[i+2][j], self.board[i+3][j]]
+                    if "pl_1" in column and "pl_2" not in column:
+                        number = column.count("pl_1")
+                        score += self.calculate_heuristic(number)
+                    elif "pl_2" in column and "pl_1" not in column:
+                        number = column.count("pl_2")
+                        score += self.calculate_heuristic(number)
                     # Check victory diagonal bottom to top
-                    if (j < 4 and 
-                        self.board[i][j] == self.board[i+1][j+1] == self.board[i+2][j+2] == self.board[i+3][j+3]):
-                        pass
-        return None, 0
+                    if j < 4:
+                        bottom_to_top = [self.board[i][j], self.board[i+1][j+1], 
+                                         self.board[i+2][j+2], self.board[i+3][j+3]]
+                        if "pl_1" in bottom_to_top and "pl_2" not in bottom_to_top:
+                            number = bottom_to_top.count("pl_1")
+                            score += self.calculate_heuristic(number)
+                        elif "pl_2" in bottom_to_top and "pl_1" not in bottom_to_top:
+                            number = bottom_to_top.count("pl_2")
+                            score += self.calculate_heuristic(number)
+        return None, score
     
     def minimax(self, player, depth):
         # Minimax.
@@ -140,6 +157,7 @@ class Connect_4:
         # Add heuristic here
         if depth == 0:
             _, value = self.find_line_of_four()
+            print(value)
             return None, value
         else:
             for move in available_moves:
