@@ -44,6 +44,12 @@ class Connect_4:
         j = event.x // int(width/7)
         self.make_move_player(j)
         self.switch_turns()
+        if game.vs_comp == True:
+            move, _ = self.minimax(self.pl_comp, self.depth)
+            print(move)
+            print("hi")
+            self.make_move_player(move)
+            self.switch_turns()
         victory, coordinates = self.check_win()
         if victory == "pl_1" or victory == "pl_2":
             # List for drawing winning circles.
@@ -64,11 +70,6 @@ class Connect_4:
                     # Change hovering color to white if the game is over.
                     canvas.itemconfig("empty", activefill="white")
             return
-        move, _ = self.minimax(self.pl_comp, self.depth)
-        print(move)
-        print("hi")
-        self.make_move_player(move)
-        self.switch_turns()
 
     def make_move_player(self, move):
         # Make a move and make changes to the visual representation.
@@ -153,7 +154,7 @@ class Connect_4:
         # See if there's a winner or if it's a draw.
         winner, _ = self.check_win()
         if winner == self.pl_comp:
-            return None,  10000
+            return None, 10000
         elif winner == self.pl_human:
             return None, - 10000
         elif available_moves == []:
@@ -209,11 +210,11 @@ for j in range(7):
         circles[i][j] = canvas.create_oval(width / 140 + width * j / 7 , height / 120 + height * i / 6,
                                            width * 9 / 70 + width * j / 7, height * 3 / 20 + height * i / 6, 
                                            width = 3, fill="white", activefill=game.pl_1_col_hover,  tag="empty")
-        if game.pl_comp == "pl_2":
+        if game.vs_comp == False or game.vs_comp == True and game.pl_comp == "pl_2":
             # On click on each button, run handle_click method.
             canvas.tag_bind(circles[i][j], "<Button-1>", game.handle_click)
 
-if game.pl_comp == "pl_1":
+if game.vs_comp == True and game.pl_comp == "pl_1":
     value, _ = game.minimax(game.pl_comp, game.depth)
     game.make_move_player(value)
     game.switch_turns()
