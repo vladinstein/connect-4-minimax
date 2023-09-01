@@ -154,9 +154,10 @@ class Connect_4:
         # See if there's a winner or if it's a draw.
         winner, _ = self.check_win()
         if winner == self.pl_comp:
-            return None, 10000
+            #https://stackoverflow.com/questions/66053813/minimax-algorithm-for-connect-4-producing-a-losing-move
+            return None, 10000 + depth
         elif winner == self.pl_human:
-            return None, - 10000
+            return None, - 10000 - depth
         elif available_moves == []:
             return None, 0
         # If reached the depth, use heuristic.
@@ -177,6 +178,8 @@ class Connect_4:
                     move_scores[move[1]] = result[1]
                 self.board[move[0]][move[1]] = move[1]
         # Calculation for choosing the move with the best score. 
+        # The move that returns victory from deeper level is evaluated earlier and gets chosen instead
+        # of the move that gets victory immediately. need to fix. 
         if player == self.pl_comp:
             maximize = - 100000
             for i in move_scores:
