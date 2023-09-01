@@ -46,8 +46,6 @@ class Connect_4:
         self.switch_turns()
         if game.vs_comp == True:
             move, _ = self.minimax(self.pl_comp, self.depth)
-            print(move)
-            print("hi")
             self.make_move_player(move)
             self.switch_turns()
         victory, coordinates = self.check_win()
@@ -155,19 +153,19 @@ class Connect_4:
         winner, _ = self.check_win()
         if winner == self.pl_comp:
             #https://stackoverflow.com/questions/66053813/minimax-algorithm-for-connect-4-producing-a-losing-move
-            return None, 10000 + depth
+            return None, 100000 + depth
         elif winner == self.pl_human:
-            return None, - 10000 - depth
+            return None, - 100000 - depth
         elif available_moves == []:
             return None, 0
         # If reached the depth, use heuristic.
-        depth -= 1
-        move_scores = {}
         # Add heuristic here
         if depth == 0:
             value = self.find_line_of_four()
             return None, value
         else:
+            depth -= 1
+            move_scores = {}
             for move in available_moves:
                 self.board[move[0]][move[1]] = player
                 if player == self.pl_comp:
@@ -181,13 +179,13 @@ class Connect_4:
         # The move that returns victory from deeper level is evaluated earlier and gets chosen instead
         # of the move that gets victory immediately. need to fix. 
         if player == self.pl_comp:
-            maximize = - 100000
+            maximize = - 1000000
             for i in move_scores:
                 if move_scores[i] > maximize:
                     maximize = move_scores[i]
                     max_index = i
         else:
-            maximize = 100000
+            maximize = 1000000
             for i in move_scores:
                 if move_scores[i] < maximize:
                     maximize = move_scores[i]
