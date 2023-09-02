@@ -91,7 +91,9 @@ class Connect_4:
                                   self.pl_2_color, tag="filled")
                 # Switch hovering color to next player's.
                 canvas.itemconfig("empty", activefill=self.pl_2_col_hover if self.pl_move == "pl_1" else 
-                                  self.pl_1_col_hover)
+                                self.pl_1_col_hover)
+                if self.vs_comp and self.pl_move == self.pl_human:
+                    canvas.itemconfig("empty", activefill="white")
                 return
                 
     def switch_turns(self):
