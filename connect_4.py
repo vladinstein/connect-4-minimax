@@ -29,7 +29,7 @@ class Connect_4:
                         return self.board[i][j], [[i, j], [i-1, j+1], [i-2, j+2],[i-3, j+3]]
                 if i < 3:
                     # Check victory in a column
-                    if (isinstance(self.board[i][j], str) and 
+                    if ((self.board[i][j] == "pl_1" or self.board[i][j] == "pl_2") and 
                         self.board[i][j] == self.board[i+1][j] == self.board[i+2][j] == self.board[i+3][j]):
                         return self.board[i][j], [[i, j], [i+1, j], [i+2, j], [i+3, j]]
                     # Check victory diagonal bottom to top
@@ -44,35 +44,45 @@ class Connect_4:
         j = event.x // int(width/7)
         self.make_move_player(j)
         self.switch_turns()
+        window.update()
+        victory, coordinates = self.check_win()
+        if victory == "pl_1" or victory == "pl_2":
+            game.draw_a_winning_line(coordinates)
+            return
+        # Need to check victory for human as well
         if game.vs_comp == True:
             move, _ = self.minimax(self.pl_comp, self.depth)
             self.make_move_player(move)
             self.switch_turns()
         victory, coordinates = self.check_win()
         if victory == "pl_1" or victory == "pl_2":
-            # List for drawing winning circles.
-            winning_cirscles = [_ for _ in range(4)]
-            # Draw white circles on top of the winning line.
-            for coord in coordinates:
-                i, j = coord[0], coord[1]
-                for x in range(4):
-                    winning_cirscles[x] = canvas.create_oval(width / 28 + width * j / 7 - width/200, 
-                                                             height / 24 + height * i / 6, 
-                                                             width * 7.5 / 70 + width * j / 7 - width/200,
-                                                             height * 7.5 / 60 + height * i / 6, width = 3, 
-                                                             fill="white",  tag="victory")
-            for j in range(7):
-                for i in range(6):
-                    # Unbind all the buttons if the game is over.
-                    canvas.tag_unbind(circles[i][j], "<Button-1>")
-                    # Change hovering color to white if the game is over.
-                    canvas.itemconfig("empty", activefill="white")
+            game.draw_a_winning_line(coordinates)
             return
+        
+    def draw_a_winning_line(self, coordinates):
+        # List for drawing winning circles.
+        winning_cirscles = [_ for _ in range(4)]
+        # Draw white circles on top of the winning line.
+        for coord in coordinates:
+            i, j = coord[0], coord[1]
+            for x in range(4):
+                winning_cirscles[x] = canvas.create_oval(width / 28 + width * j / 7 - width/200, 
+                                                            height / 24 + height * i / 6, 
+                                                            width * 7.5 / 70 + width * j / 7 - width/200,
+                                                            height * 7.5 / 60 + height * i / 6, width = 3, 
+                                                            fill="white",  tag="victory")
+        for j in range(7):
+            for i in range(6):
+                # Unbind all the buttons if the game is over.
+                canvas.tag_unbind(circles[i][j], "<Button-1>")
+                # Change hovering color to white if the game is over.
+                canvas.itemconfig("empty", activefill="white")
+
 
     def make_move_player(self, move):
         # Make a move and make changes to the visual representation.
         for i in reversed(range(6)):
-            if isinstance(self.board[i][move], int):
+            if self.board[i][move] != "pl_1" and self.board[i][move] != "pl_2":
                 # Save the move.
                 self.board[i][move] = self.pl_move
                 # Change visuals accordingly.
@@ -93,7 +103,7 @@ class Connect_4:
         available_moves = []
         for j in range(7):
             for i in reversed(range(6)):
-                if isinstance(self.board[i][j], int):
+                if self.board[i][j] != "pl_1" and self.board[i][j] != "pl_2":
                     available_moves.append([i, j])
                     break
         return available_moves
@@ -116,7 +126,7 @@ class Connect_4:
                     # Check 4 in a row diagonal top to bottom
                     if i > 2:
                         top_to_bottom = [self.board[i][j], self.board[i-1][j+1], 
-                                        self.board[i-2][j+2], self.board[i-3][j+3]]
+                                         self.board[i-2][j+2], self.board[i-3][j+3]]
                         if self.pl_comp in top_to_bottom and self.pl_human not in top_to_bottom:
                             number = top_to_bottom.count(self.pl_comp)
                             score += self.calculate_heuristic(number)
@@ -125,8 +135,7 @@ class Connect_4:
                             score -= self.calculate_heuristic(number)              
                 if i < 3:
                     # Check 4 in a row in a column
-                    column = [self.board[i][j], self.board[i+1][j], 
-                              self.board[i+2][j], self.board[i+3][j]]
+                    column = [col[j] for col in self.board[i:i+4]]
                     if self.pl_comp in column and self.pl_human not in column:
                         number = column.count(self.pl_comp)
                         score += self.calculate_heuristic(number)
