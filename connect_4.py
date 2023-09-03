@@ -15,6 +15,7 @@ class Connect_4:
         self.vs_comp = True
         self.pl_comp = "pl_1"
         self.pl_human = "pl_2"
+        self.menu = True
         
     def check_win(self):
         for i in range(6):
@@ -102,6 +103,7 @@ class Connect_4:
     def find_available(self):
         # This function returns "j" coordinate of all available moves.
         # Are we going to need the "i" coordinate later?
+        #available_moves = [[(next(i for i in reversed(range(6)) if self.board[i][j] not in ["pl_1", "pl_2"])), j] for j in range(7)]
         available_moves = []
         for j in range(7):
             for i in reversed(range(6)):
@@ -214,14 +216,20 @@ window.resizable(False, False)
 
 canvas = Canvas(width=width, height=height, bg="blue")
 canvas.pack()
+canvas.create_text(width/2,height/4,fill="black",font="Aerial 25 bold",
+                    text="Game Mode.")
+canvas.create_text(width/2,height/2,fill="darkblue",font="Aerial 25 bold",
+                    text="Human VS Human", activefill="black")
+canvas.create_text(width/2,height*3/4,fill="darkblue",font="Aerial 25 bold",
+                    text="Human VS Destroyer 1.1", activefill="black")
 # List of lists for saving circle visual objects.
 circles = [[j for j in range(7)] for _ in range(6)]
 # Loops for drawing all the circles.
 for j in range(7):
     for i in range(6):
         circles[i][j] = canvas.create_oval(width / 140 + width * j / 7 , height / 120 + height * i / 6,
-                                           width * 9 / 70 + width * j / 7, height * 3 / 20 + height * i / 6, 
-                                           width = 3, fill="white", activefill=game.pl_1_col_hover,  tag="empty")
+                                        width * 9 / 70 + width * j / 7, height * 3 / 20 + height * i / 6, 
+                                        width = 3, fill="white", activefill=game.pl_1_col_hover,  tag="empty")
         if game.vs_comp == False or game.vs_comp == True and game.pl_comp == "pl_2":
             # On click on each button, run handle_click method.
             canvas.tag_bind(circles[i][j], "<Button-1>", game.handle_click)
