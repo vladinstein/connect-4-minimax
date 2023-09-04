@@ -13,7 +13,7 @@ class Connect_4:
         self.pl_1_col_hover = "#FF7F7F"
         self.pl_2_col_hover = "#FFFD8F"
         self.depth = 5
-        self.vs_comp = True
+        self.vs_comp = False
         self.pl_comp = "pl_1"
         self.pl_human = "pl_2"
         
@@ -71,8 +71,8 @@ class Connect_4:
                                                             height / 24 + height * i / 6, 
                                                             width * 7.5 / 70 + width * j / 7 - width/200,
                                                             height * 7.5 / 60 + height * i / 6, width = 3, 
-                                                            fill="yellow" if self.pl_move == "pl_2" and 
-                                                            self.pl_1_color == "red" else "red",  tag="victory")
+                                                            fill=self.pl_1_color if self.pl_move == "pl_1" 
+                                                            else self.pl_2_color,  tag="victory")
         for j in range(7):
             for i in range(6):
                 # Unbind all the buttons if the game is over.
@@ -205,10 +205,36 @@ class Connect_4:
                     max_index = i
         return max_index, maximize
     
-    def first_menu(self, ai, _):
+    def second_menu(self, _):
         canvas.delete("all")
-        if not ai:
-            self.vs_comp = False
+        self.vs_comp = True
+        canvas.create_text(width/2,height/4,fill="black",font="Aerial 25 bold",
+                    text="First move:")
+        first = canvas.create_text(width/2,height/2,fill="darkblue",font="Aerial 25 bold",
+                            text="Human", activefill="black")
+        second = canvas.create_text(width/2,height*3/4,fill="darkblue",font="Aerial 25 bold",
+                            text="Destroyer 1.1", activefill="black")
+        canvas.tag_bind(first, "<Button-1>", lambda event: game.third_menu(1, event))
+        canvas.tag_bind(second, "<Button-1>", lambda event: game.third_menu(0, event))
+
+    def third_menu(self, first, _):
+        canvas.delete("all")
+        if first:
+            self.pl_comp, self.pl_human = self.pl_human, self.pl_comp
+        canvas.create_text(width/2,height/4,fill="black",font="Aerial 25 bold",
+                    text="Pick Your Color:")
+        red = canvas.create_text(width/2,height/2,fill="darkblue",font="Aerial 25 bold",
+                            text="Red", activefill="black")
+        yellow = canvas.create_text(width/2,height*3/4,fill="darkblue",font="Aerial 25 bold",
+                            text="Yellow", activefill="black")
+        canvas.tag_bind(red, "<Button-1>", lambda event: game.start_game(1, event))
+        canvas.tag_bind(yellow, "<Button-1>", lambda event: game.start_game(0, event))
+
+    def start_game(self, color, _):
+        canvas.delete("all")
+        if color and self.pl_human == "pl_2" or not color and self.pl_human == "pl_1":
+            self.pl_1_color, self.pl_2_color = self.pl_2_color, self.pl_1_color
+            self.pl_1_col_hover, self.pl_2_col_hover = self.pl_2_col_hover, self.pl_1_col_hover
         # Loops for drawing all the circles.
         for j in range(7):
             for i in range(6):
@@ -243,8 +269,8 @@ vs_human = canvas.create_text(width/2,height/2,fill="darkblue",font="Aerial 25 b
                     text="Human VS Human", activefill="black")
 vs_ai = canvas.create_text(width/2,height*3/4,fill="darkblue",font="Aerial 25 bold",
                     text="Human VS Destroyer 1.1", activefill="black")
-canvas.tag_bind(vs_ai, "<Button-1>", lambda event: game.first_menu(1, event))
-canvas.tag_bind(vs_human, "<Button-1>", lambda event: game.first_menu(0, event))
+canvas.tag_bind(vs_ai, "<Button-1>", game.second_menu)
+canvas.tag_bind(vs_human, "<Button-1>", lambda event: game.start_game(0, event))
 
 
 window.mainloop()
