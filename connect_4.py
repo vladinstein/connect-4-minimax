@@ -101,9 +101,7 @@ class Connect_4:
         self.pl_move, self.pl_not_move = self.pl_not_move, self.pl_move
 
     def find_available(self):
-        # This function returns "j" coordinate of all available moves.
-        # Are we going to need the "i" coordinate later?
-        #available_moves = [[(next(i for i in reversed(range(6)) if self.board[i][j] not in ["pl_1", "pl_2"])), j] for j in range(7)]
+        # Returns "j" coordinate of all available moves.
         available_moves = []
         for j in range(7):
             for i in reversed(range(6)):
@@ -116,6 +114,7 @@ class Connect_4:
         return 1 << 4 * number
     
     def find_line_of_four(self):
+        # Finds four-in-a-row with (1-3) pieces of one player and no pieces of the other.
         score = 0
         for i in range(6):
             for j in range(7):
@@ -159,7 +158,6 @@ class Connect_4:
         return score
     
     def minimax(self, player, depth):
-        # Minimax.
         # Find available moves.
         available_moves = self.find_available()
         # See if there's a winner or if it's a draw.
@@ -171,12 +169,13 @@ class Connect_4:
             return None, - 100000 - depth
         elif available_moves == []:
             return None, 0
-        # If reached the depth, use heuristic.
-        # Add heuristic here
+        # If reached the maximum depth, use heuristic.
         if depth == 0:
+            # Calculate position on a board
             value = self.find_line_of_four()
             return None, value
         else:
+            # Recursive call of the function for an opposite player.
             depth -= 1
             move_scores = {}
             for move in available_moves:
@@ -188,9 +187,7 @@ class Connect_4:
                     result = self.minimax(self.pl_comp, depth)
                     move_scores[move[1]] = result[1]
                 self.board[move[0]][move[1]] = move[1]
-        # Calculation for choosing the move with the best score. 
-        # The move that returns victory from deeper level is evaluated earlier and gets chosen instead
-        # of the move that gets victory immediately. need to fix. 
+        # Calculation for choosing the move with the best score.
         if player == self.pl_comp:
             maximize = - 1000000
             for i in move_scores:
@@ -206,6 +203,7 @@ class Connect_4:
         return max_index, maximize
     
     def second_menu(self, _):
+        # Menu for choosing who moves first.
         canvas.delete("all")
         self.vs_comp = True
         canvas.create_text(width/2,height/4,fill="black",font="Aerial 25 bold",
@@ -218,6 +216,7 @@ class Connect_4:
         canvas.tag_bind(second, "<Button-1>", lambda event: game.third_menu(0, event))
 
     def third_menu(self, first, _):
+        # Menu for choosing your color.
         canvas.delete("all")
         if first:
             self.pl_comp, self.pl_human = self.pl_human, self.pl_comp
@@ -232,6 +231,7 @@ class Connect_4:
 
     def start_game(self, color, _):
         canvas.delete("all")
+        # Switch colors if needed.
         if color and self.pl_human == "pl_2" or not color and self.pl_human == "pl_1":
             self.pl_1_color, self.pl_2_color = self.pl_2_color, self.pl_1_color
             self.pl_1_col_hover, self.pl_2_col_hover = self.pl_2_col_hover, self.pl_1_col_hover
@@ -242,12 +242,14 @@ class Connect_4:
                                                 width * 9 / 70 + width * j / 7, height * 3 / 20 + height * i / 6, 
                                                 width = 3, fill="#ADD8E6", activefill=game.pl_1_col_hover,  tag="empty")
                 if game.vs_comp == False or game.vs_comp == True and game.pl_comp == "pl_2":
-                    # On click on each button, run handle_click method.
+                    # Bind a click on any of the circles to the function.
                     canvas.tag_bind(self.circles[i][j], "<Button-1>", game.handle_click)
+        # First move of the computer if needed.
         if game.vs_comp == True and game.pl_comp == "pl_1":
             value, _ = game.minimax(game.pl_comp, game.depth)
             game.make_move_player(value)
             game.switch_turns()
+            # Bind a click on any of the circles to the function.
             for j in range(7):
                 for i in range(6):
                     canvas.tag_bind(self.circles[i][j], "<Button-1>", game.handle_click)
@@ -263,6 +265,7 @@ window.resizable(False, False)
 
 canvas = Canvas(width=width, height=height, bg="blue")
 canvas.pack()
+# First menu: game vs computer or vs another player.
 canvas.create_text(width/2,height/4,fill="black",font="Aerial 25 bold",
                     text="Game Mode:")
 vs_human = canvas.create_text(width/2,height/2,fill="darkblue",font="Aerial 25 bold",
