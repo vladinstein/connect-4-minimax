@@ -176,31 +176,26 @@ class Connect_4:
             return None, value
         else:
             # Recursive call of the function for an opposite player.
-            depth -= 1
-            move_scores = {}
-            for move in available_moves:
-                self.board[move[0]][move[1]] = player
-                if player == self.pl_comp:
-                    result = self.minimax(self.pl_human, depth)
-                    move_scores[move[1]] = result[1]
-                else:
-                    result = self.minimax(self.pl_comp, depth)
-                    move_scores[move[1]] = result[1]
-                self.board[move[0]][move[1]] = move[1]
-        # Calculation for choosing the move with the best score.
-        if player == self.pl_comp:
-            maximize = - 1000000
-            for i in move_scores:
-                if move_scores[i] > maximize:
-                    maximize = move_scores[i]
-                    max_index = i
-        else:
-            maximize = 1000000
-            for i in move_scores:
-                if move_scores[i] < maximize:
-                    maximize = move_scores[i]
-                    max_index = i
-        return max_index, maximize
+            if player == self.pl_comp:
+                maximize = - 1000000
+                for move in available_moves:
+                    self.board[move[0]][move[1]] = player
+                    result = self.minimax(self.pl_human, depth - 1)
+                    # Choose the best move.
+                    if result[1] > maximize:
+                        maximize = result[1]
+                        max_index = move[1]
+                    self.board[move[0]][move[1]] = move[1]
+            else:
+                maximize = 1000000
+                for move in available_moves:
+                    self.board[move[0]][move[1]] = player
+                    result = self.minimax(self.pl_comp, depth - 1)
+                    if result[1] < maximize:
+                        maximize = result[1]
+                        max_index = move[1]
+                    self.board[move[0]][move[1]] = move[1]
+            return max_index, maximize
     
     def second_menu(self, _):
         # Menu for choosing who moves first.
