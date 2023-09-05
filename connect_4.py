@@ -12,7 +12,7 @@ class Connect_4:
         self.pl_2_color = 'yellow'
         self.pl_1_col_hover = "#FF7F7F"
         self.pl_2_col_hover = "#FFFD8F"
-        self.depth = 5
+        self.depth = 6
         self.vs_comp = False
         self.pl_comp = "pl_1"
         self.pl_human = "pl_2"
@@ -52,7 +52,7 @@ class Connect_4:
             return
         # Need to check victory for human as well
         if game.vs_comp == True:
-            move, _ = self.minimax(self.pl_comp, self.depth)
+            move, _ = self.minimax(self.pl_comp, self.depth, float("-inf"), float("inf"))
             self.make_move_player(move)
             self.switch_turns()
         victory, coordinates = self.check_win()
@@ -157,7 +157,7 @@ class Connect_4:
                             score -= self.calculate_heuristic(number)
         return score
     
-    def minimax(self, player, depth):
+    def minimax(self, player, depth, alpha, beta):
         # Find available moves.
         available_moves = self.find_available()
         # See if there's a winner or if it's a draw.
@@ -177,24 +177,30 @@ class Connect_4:
         else:
             # Recursive call of the function for an opposite player.
             if player == self.pl_comp:
-                maximize = - 1000000
+                maximize = float("-inf")
                 for move in available_moves:
                     self.board[move[0]][move[1]] = player
-                    result = self.minimax(self.pl_human, depth - 1)
+                    result = self.minimax(self.pl_human, depth - 1, alpha, beta)
                     # Choose the best move.
                     if result[1] > maximize:
                         maximize = result[1]
                         max_index = move[1]
+                    alpha = max(maximize, alpha)
                     self.board[move[0]][move[1]] = move[1]
+                    if beta <= alpha:
+                        break
             else:
-                maximize = 1000000
+                maximize = float("inf")
                 for move in available_moves:
                     self.board[move[0]][move[1]] = player
-                    result = self.minimax(self.pl_comp, depth - 1)
+                    result = self.minimax(self.pl_comp, depth - 1, alpha, beta)
                     if result[1] < maximize:
                         maximize = result[1]
                         max_index = move[1]
+                    beta = min(maximize, beta)
                     self.board[move[0]][move[1]] = move[1]
+                    if beta <= alpha:
+                        break
             return max_index, maximize
     
     def second_menu(self, _):
@@ -241,7 +247,7 @@ class Connect_4:
                     canvas.tag_bind(self.circles[i][j], "<Button-1>", game.handle_click)
         # First move of the computer if needed.
         if game.vs_comp == True and game.pl_comp == "pl_1":
-            value, _ = game.minimax(game.pl_comp, game.depth)
+            value, _ = game.minimax(game.pl_comp, game.depth, float("-inf"), float("inf"))
             game.make_move_player(value)
             game.switch_turns()
             # Bind a click on any of the circles to the function.
