@@ -50,6 +50,10 @@ class Connect_4:
         if victory == "pl_1" or victory == "pl_2":
             game.draw_a_winning_line(coordinates)
             return
+        # Check if it's a draw.
+        avail_moves = self.find_available()
+        if not avail_moves:
+            return
         # Need to check victory for human as well
         if game.vs_comp == True:
             move, _ = self.minimax(self.pl_comp, self.depth, float("-inf"), float("inf"))
